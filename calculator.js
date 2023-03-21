@@ -17,7 +17,7 @@ keys.addEventListener('click', (event) => {
   const { target } = event
   const { value } = target
   if (!target.matches('button')) {
-    return
+    return;
   } else {
     // pass value to parse method
     calculator.parseInput(value)
@@ -30,25 +30,57 @@ const calculator = {
   prevTotal: null,
 
   parseInput(value) {
-    if (this.displayText === '0') {
-      this.displayText === ''
-    }
     // have any of the "special buttons" been clicked
     switch (value) {
       case '=':
         // calculate the answer
-        break
+        this.calcAnswer(this.displayText)
+        break;
       case 'AC':
         // clear screen and stored values
-        break
+        this.clearAll()
+        break;
       case '.':
-        if (this.displayText === '0') {
+        if (this.displayText == 0) {
           // pass '0.' into text method
+          this.addText('0.')
         } else {
           // add value to text string
+          this.addText(value)
         }
+        break;
+      default:
+        // add value to text string
+        this.addText(value)
+        break;
     }
-
-    addText(value)
   },
+  addText(value) {
+    if (this.displayText === '0') {
+      this.displayText = ''
+    } else if (this.prevTotal !== null) {
+      this.displayText = this.prevTotal
+      this.prevTotal = null
+    }
+    if (isNaN(+(value)) && isNaN(+(this.displayText))) {
+      if(isNaN(this.displayText.slice(-1))) {
+        return;
+      }
+    }
+    this.displayText += value
+    // output display text to screen
+    this.outputText(this.displayText)
+  },
+  outputText(text) {
+    document.querySelector('.screen').innerHTML = text;
+  },
+  calcAnswer(equation) {
+    let result = Function("return " + equation)()
+    this.outputText(result)
+  },
+  clearAll() {
+    this.displayText = '0',
+    this.prevTotal = null,
+    this.outputText(this.displayText)
+  }
 }
